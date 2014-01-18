@@ -1,0 +1,32 @@
+doctype html
+html(lang="en", ng-app="abletonApp")
+  head
+    title= title
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    link(rel="stylesheet", type="text/css", href="/css/bootstrap.min.css")
+    link(rel="stylesheet", type="text/css", href="font-awesome-4.0.3/css/font-awesome.min.css")
+    link(rel="stylesheet", type="text/css", href="/css/styles.css")
+    //if lt IE 9 
+      <script type="text/javascript" src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script type="text/javascript" src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    script(type="text/javascript", src="/js/app.js")
+  body
+    
+    #header
+      .container(ng-controller="HeaderCtrl")
+        .row
+          h1 Ableton App ({{version}})
+    
+    #wrapper
+
+      .container(ng-controller="ControlsCtrl")
+        .row
+          ul
+            li(ng-repeat="control in controls track by $index") 
+              a(href="{{control.link}}") {{control.name}}
+              button(ng-click="del($index)") -
+        .row
+          p
+            input(ng-model="testProp")
+            button(ng-click="add(testProp)") +
+          p(ng-bind="testProp")
