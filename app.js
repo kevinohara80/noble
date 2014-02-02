@@ -13,9 +13,6 @@ app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(express.static(__dirname + '/public'));
 app.use(app.router);
-app.set('view options', { pretty: true });
-app.set('view engine', 'jade');
-app.set('views', __dirname + '/views');
 
 fs.readdir(__dirname + '/routes', function(err, files) {
   if(err) throw err;

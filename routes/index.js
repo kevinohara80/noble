@@ -1,7 +1,10 @@
+var fs = require('fs');
+
 module.exports = function(app) {
+  console.log(__dirname);
 
   app.get('/', function(req, res) {
-    res.render('index', { title: 'Hello World'});
+    fs.createReadStream('index.html').pipe(res);
   });
 
 }
