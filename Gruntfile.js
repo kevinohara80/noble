@@ -34,7 +34,8 @@ module.exports = function(grunt) {
           'src/js/vendor/lodash-2.4.1.js',
           'src/js/vendor/jquery-1.10.2.js',
           'src/js/vendor/angular.min.js',
-          'src/js/app/app.js'
+          'src/js/app/app.js',
+          'src/js/app/**/*.js'
         ],
         dest: 'tmp/js/app.js'
       }

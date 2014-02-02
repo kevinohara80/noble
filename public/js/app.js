@@ -16773,17 +16773,19 @@ version:Sd,isDate:La,lowercase:x,uppercase:Ia,callbacks:{counter:0},$$minErr:F,$
 ngInit:te,ngNonBindable:ue,ngPluralize:ve,ngRepeat:we,ngShow:xe,ngStyle:ze,ngSwitch:Ae,ngSwitchWhen:Be,ngSwitchDefault:Ce,ngOptions:Ge,ngTransclude:De,ngModel:de,ngList:fe,ngChange:ee,required:Nc,ngRequired:Nc,ngValue:he}).directive({ngInclude:se}).directive(Ob).directive(Oc);a.provider({$anchorScroll:dd,$animate:Ud,$browser:fd,$cacheFactory:gd,$controller:jd,$document:kd,$exceptionHandler:ld,$filter:Bc,$interpolate:qd,$interval:rd,$http:md,$httpBackend:od,$location:ud,$log:vd,$parse:yd,$rootScope:Bd,
 $q:zd,$sce:Fd,$sceDelegate:Ed,$sniffer:Gd,$templateCache:hd,$timeout:Hd,$window:Id})}])})(Ca);A(Q).ready(function(){Tc(Q,Zb)})})(window,document);!angular.$$csp()&&angular.element(document).find("head").prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide{display:none !important;}ng\\:form{display:block;}</style>');
 //# sourceMappingURL=angular.min.js.map
-;(function($) {
-  var abletonApp = angular.module('abletonApp', []);
+;(function() {
+  
+  angular.module('nub', []);
 
-  var HeaderCtrl = function($scope, $http, $location) {
-    $scope.version = 'v0.0.1';
-  };
+}());;(function() {
 
-  HeaderCtrl.$inject = ['$scope', '$http', '$location'];
-  abletonApp.controller('HeaderCtrl', HeaderCtrl);
- 
-  var ControlsCtrl = function($scope) {
+  var ControlsCtrl = function($scope, socket) {
+
+    socket.emit('midi:listen:start');
+
+    socket.on('midi:message', function(message) {
+      $scope.controls.push({ name: message, type: 'midi' });
+    });
     
     $scope.controls = [
       { name: 'ISY-99i', type: 'Home Automation'},
@@ -16800,10 +16802,63 @@ $q:zd,$sce:Fd,$sceDelegate:Ed,$sniffer:Gd,$templateCache:hd,$timeout:Hd,$window:
     $scope.del = function(index) {
       $scope.controls.splice(index, 1);
     };
+
+    // stop listeners and unsubscribe
+    $scope.$on('$destroy', function() {
+      socket.removeAllListeners();
+      socket.emit('midi:listen:stop');
+    });
     
   };
 
-  ControlsCtrl.$inject = ['$scope'];
-  abletonApp.controller('ControlsCtrl', ControlsCtrl);
+  ControlsCtrl.$inject = ['$scope', 'socket'];
+  angular.module('nub').controller('ControlsCtrl', ControlsCtrl);
 
-}(jQuery));
+}());;(function() {
+
+  var HeaderCtrl = function($scope, $http, $location) {
+    $scope.version = 'v0.0.1';
+  };
+
+  HeaderCtrl.$inject = ['$scope', '$http', '$location'];
+  angular.module('nub').controller('HeaderCtrl', HeaderCtrl);
+
+}());;(function() {
+
+  var socket = function($rootScope) {
+    var s = io.connect();
+
+    var api = {};
+
+    api.on = function (eventName, callback) {
+      s.on(eventName, function () {  
+        var args = arguments;
+        $rootScope.$apply(function () {
+          callback.apply(socket, args);
+        });
+      });
+    };
+
+    api.emit = function (eventName, data, callback) {
+      s.emit(eventName, data, function () {
+        var args = arguments;
+        $rootScope.$apply(function () {
+          if (callback) {
+            callback.apply(socket, args);
+          }
+        });
+      })
+    };
+
+    // $rootScope.$on('$destroy', function() {
+    //   s.removeAllListeners();
+    //   s.emit('midi:listen:stop');
+    // });
+
+    return api;
+  }
+
+  socket.$inject = ['$rootScope'];
+  angular.module('nub').factory('socket', socket);
+
+}());
